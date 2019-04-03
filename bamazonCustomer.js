@@ -28,8 +28,8 @@ function display() {
         if (err) throw err;
         console.table(results);
     });
-    
-    
+};
+    var thatWay = function() {
     inquirer
         .prompt([{
                 type: "input",
@@ -54,7 +54,7 @@ function display() {
         .then(function (answer) {
             var item_ID = answer.purchase;
             // var quantityAnswer = answer.quantity;
-            var confirmAnswer = answer.quantity;
+            // var confirmAnswer = answer.quantity;
 
             connection.query('SELECT * FROM `products` WHERE `id` = ?', [item_ID], function (error, results) {
                 if (error) throw error;
@@ -62,7 +62,7 @@ function display() {
                 if (results === 0) {
                     console.log("Please pick a valid id from the table!");
 
-                    display();
+                    thatWay();
                 } else {
                     console.log("We have the item you are looking for!")
                     .then(function(answer2){
@@ -70,16 +70,29 @@ function display() {
                         if (quantityAnswer > results[0].stock_quantity) {
                             console.log("We dont have that shiit, we only have about " + results[0].stock_quantity + " ,that's all we got!")
 
-                            display();
+                            thatWay();
                         } else {
                             console.log("");
-                            console.log(results[0].)
+                            console.log(results[0].product_name + " purchased!")
+
+                            var updateQuantity = results[0].stock_quantity - quantityAnswer;
+                            connnection.query( 
+                                "UPDATE products SET stock_quantity = " + updateQuantity + " WHERE id = " + results[0].id, function(err, resultsUpdate) {
+                                    if (err) throw err;
+                                    console.log("Your order is completed. Now get out of my face! I don't want to look at you!")
+                                    connection.end();
+                                }
+                            );
+
+
                         }
-                    })
+                    });
                 }
                 
             });
 
         });
+    };
 
-}
+
+thatWay();
