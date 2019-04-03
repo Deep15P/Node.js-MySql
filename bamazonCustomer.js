@@ -15,84 +15,91 @@ var connection = mysql.createConnection({
     database: "bamazon_DB"
 });
 
-connection.connect(function (err) {
-    if (err) throw err;
-    // run the start function after the connection is made to prompt the user
-    console.log('\n -------- welcome ---------');
-    display();
-});
+
 
 
 function display() {
-    connection.query("SELECT * FROM products", function (err, results) {
-        if (err) throw err;
+    connection.query('SELECT * FROM `products`', function (error, results) {
+        if (error) throw error;
         console.table(results);
-    });
-};
-    var thatWay = function() {
-    inquirer
-        .prompt([{
-                type: "input",
-                name: "purchase",
-                message: "Type in the ID of the product you would like to buy?",
-            },
 
-            {
-                type: "input",
-                name: "quantity",
-                message: "How many would you like to buy?",
+        // connection.connect(function (err) {
+        //     if (err) throw err;
+        //     // run the start function after the connection is made to prompt the user
+        //     console.log('\n -------- welcome ---------');
 
-            },
+        // });
 
-            {
-                type: "confirm",
-                name: "confirm",
-                message: "Please confirm your order?"
-            }
-        ])
+        inquirer
+            .prompt([{
+                    type: "input",
+                    name: "purchase",
+                    message: "Type in the ID of the product you would like to buy?",
+                },
 
-        .then(function (answer) {
-            var item_ID = answer.purchase;
-            // var quantityAnswer = answer.quantity;
-            // var confirmAnswer = answer.quantity;
+                {
+                    type: "input",
+                    name: "quantity",
+                    message: "How many would you like to buy?",
 
-            connection.query('SELECT * FROM `products` WHERE `id` = ?', [item_ID], function (error, results) {
-                if (error) throw error;
-                // console.log(results);
-                if (results === 0) {
-                    console.log("Please pick a valid id from the table!");
+                },
 
-                    thatWay();
-                } else {
-                    console.log("We have the item you are looking for!")
-                    .then(function(answer2){
-                        var quantityAnswer = answer2.quantity;
-                        if (quantityAnswer > results[0].stock_quantity) {
-                            console.log("We dont have that shiit, we only have about " + results[0].stock_quantity + " ,that's all we got!")
-
-                            thatWay();
-                        } else {
-                            console.log("");
-                            console.log(results[0].product_name + " purchased!")
-
-                            var updateQuantity = results[0].stock_quantity - quantityAnswer;
-                            connnection.query( 
-                                "UPDATE products SET stock_quantity = " + updateQuantity + " WHERE id = " + results[0].id, function(err, resultsUpdate) {
-                                    if (err) throw err;
-                                    console.log("Your order is completed. Now get out of my face! I don't want to look at you!")
-                                    connection.end();
-                                }
-                            );
-
-
-                        }
-                    });
+                {
+                    type: "confirm",
+                    name: "confirm",
+                    message: "Please confirm your order?"
                 }
-                
+            ])
+
+            .then(function (answer) {
+                var item_ID = answer.purchase - 1;
+                var quantityAnswer = answer.quantity;
+                // var quantityAnswer = answer.quantity; 
+                // var confirmAnswer = answer.quantity;
+
+                connection.query('SELECT * FROM `products`', function (error, results) {
+                    if (error) throw error;
+                    // console.log(results);
+                    // console.log(item_ID);
+                    // console.log(answer.quantity);
+                    // console.log(results[item_ID].product_name)
+                    // console.log(results[item_ID].stock_quantity)
+                    // console.log("We have the item you are looking for!")
+
+
+                    if (quantityAnswer >= results[item_ID].stock_quantity) {
+                        console.log("We dont have that shiit, we only have about " + results[item_ID].stock_quantity + " ,that's all we got!")
+                        display();
+
+
+                    } else {
+                        // console.log("");
+                        console.log(results[item_ID].product_name + " purchased!")
+
+                        var updateQuantity = results[item_ID].stock_quantity - quantityAnswer;
+
+
+                        connection.query("UPDATE products SET ? WHERE ?", [{
+                                    stock_quantity: updateQuantity
+                                },
+                                {
+                                    id: answer.purchase
+                                }
+
+                            ],
+                            function (err, resultsUpdate) {
+                                if (err) throw err;
+                                console.log("Your order is completed. Now get out of my face! I don't want to look at you!")
+                                connection.destroy();
+                            }
+                        );
+
+                    }
+
+                });
+
             });
+    });
+}
 
-        });
-    };
-
-
-thatWay();
+display();
