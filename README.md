@@ -5,7 +5,7 @@ Amazon-like storefront created with Node.js/MySql
 https://github.com/Deep15P/Node.js-MySql
 
 ## Demo Video Link 
-https://drive.google.com/file/d/1ikHnA_Wj-IZRr1qzYBdv0RlmC8RaZhvh/view?usp=sharing
+https://drive.google.com/file/d/1g2bF9qTkuVuailtPqp_9xyfBBz6KFokH/view?usp=sharing
 
 ### How to use this in terminal 
 use the "node bamazonCustomer.js" command
